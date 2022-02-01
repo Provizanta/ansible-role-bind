@@ -1,0 +1,17 @@
+---
+
+dns_use_rfc1918_zones: true
+
+dns_zones: {}
+
+dns_options:
+  directory: "{{ dns_zone_dir }}"
+  forwarders: []
+  allow-query:
+    - any
+  dnssec-validation: auto
+  zone-statistics: none
+  max-cache-size: 100m
+  listen-on-v6:
+    - any
+  version: none

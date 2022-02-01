@@ -1,0 +1,27 @@
+---
+
+- name: systemd daemon reload
+  become: true
+  systemd:
+    daemon_reload: true
+
+- name: enable bind9
+  become: true
+  systemd:
+    enabled: true
+    name: bind9
+
+- name: start bind9
+  become: true
+  systemd:
+    state: started
+    name: bind9
+
+- name: restart dns services
+  become: true
+  loop:
+    - bind9
+    - systemd-resolved
+  systemd:
+    state: restarted
+    name: "{{ item }}"

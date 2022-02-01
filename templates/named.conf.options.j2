@@ -1,0 +1,25 @@
+{{ ansible_managed | comment("c") }}
+
+{% macro quote_when_necessary(v) -%}
+{%- if v.startswith('/') -%}"{{ v }}"{%- else -%}{{ v }}{%- endif -%}
+{%- endmacro -%}
+
+{%- macro render_single_value(v) -%}
+{{- (v.__class__.__name__ == 'bool')
+     | ternary(v
+         | ternary('yes','no'), quote_when_necessary(v)) -}}
+{%- endmacro -%}
+
+options {
+{% for key,value in dns_options.items() %}
+{%   if value.__class__.__name__ == 'list' %}
+    {{ key }} {
+{%     for v in value %}
+        {{ render_single_value(v) }};
+{%     endfor %}
+    };
+{%   else %}
+    {{ key }} {{ render_single_value(value) }};
+{%   endif %}
+{% endfor %}
+};

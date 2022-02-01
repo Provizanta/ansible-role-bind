@@ -1,0 +1,42 @@
+---
+
+- name: establish package
+  become: true
+  package:
+    name: bind9
+    state: present
+  notify:
+    - systemd daemon reload
+    - start bind9
+    - enable bind9
+
+- name: create zone lists
+  become: true
+  loop: "{{ dns_zones | dict2items }}"
+  vars:
+    zone: "{{ item.key }}"
+    records: "{{ item.value.records }}"
+  template:
+    src: zone.j2
+    dest: "{{ dns_zone_dir }}/{{ item.key }}.zone"
+    group: bind
+    mode: "u=rw,go=r"
+    validate: named-checkzone {{ item.key }} %s
+  notify:
+    - restart dns services
+
+- name: configure zones
+  become: true
+  loop:
+    - src: named.conf.options.j2
+      dest: named.conf.options
+    - src: named.conf.local.j2
+      dest: named.conf.local
+  template:
+    src: "{{ item.src }}"
+    dest: "{{ dns_config_dir }}/{{ item.dest }}"
+    group: bind
+    mode: "u=rw,go=r"
+    validate: named-checkconf %s
+  notify:
+    - restart dns services
