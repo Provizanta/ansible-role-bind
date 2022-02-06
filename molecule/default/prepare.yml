@@ -1,10 +1,8 @@
 ---
-
-- name: Prepare
+- name: Converge
   hosts: all
   tasks:
-    - name: apt | update
-      become: true
+    - name: update apt repository
+      when: "ansible_pkg_mgr == 'apt'"
       apt:
         update_cache: true
-        cache_valid_time: 3600
