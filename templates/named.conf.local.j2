@@ -10,9 +10,11 @@
          | ternary('yes','no'), quote_when_necessary(v)) -}}
 {%- endmacro -%}
 
-{% for zone_name,zone_detail in dns_zones.items() %}
+{% for zone_name, zone_detail in dns_zones.items() %}
 zone "{{ zone_name }}" {
+{%   if (zone_detail['config']['type'] | default('')) != 'forward' %}
     file "{{ zone_name }}.zone";
+{%   endif %}
 {%   for key,value in zone_detail.config.items() %}
 {%     if value.__class__.__name__ == 'list' %}
     {{ key }} {
