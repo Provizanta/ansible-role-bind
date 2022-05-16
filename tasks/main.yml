@@ -13,6 +13,7 @@
 - name: create zone lists
   become: true
   loop: "{{ dns_zones | dict2items }}"
+  when: (item.value['config']['type'] | default('')) != 'forward'
   vars:
     zone: "{{ item.key }}"
     records: "{{ item.value.records }}"
