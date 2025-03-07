@@ -20,6 +20,7 @@
   template:
     src: zone.j2
     dest: "{{ dns_zone_dir }}/{{ item.key }}.zone"
+    owner: bind
     group: bind
     mode: "u=rw,go=r"
     validate: named-checkzone {{ item.key }} %s
